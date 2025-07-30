@@ -20,9 +20,9 @@ function cleanHTML(html) {
 }
 
 // Function to send SMS notification
-async function sendSMSNotification(internship) {
+async function sendSMSNotification(job) {
   try {
-    console.log('📱 Sending SMS notification for:', internship.company);
+    console.log('📱 Sending SMS notification for:', job.company);
     
     const response = await fetch(`${SUPABASE_URL}/functions/v1/notify-sms`, {
       method: 'POST',
@@ -30,7 +30,7 @@ async function sendSMSNotification(internship) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${SUPABASE_KEY}`,
       },
-      body: JSON.stringify({ record: internship }),
+      body: JSON.stringify({ record: job }),
     });
 
     const result = await response.json();
@@ -45,21 +45,21 @@ async function sendSMSNotification(internship) {
   }
 }
 
-// Set up Realtime listener for new internships
+// Set up Realtime listener for new jobs
 function setupRealtimeListener() {
-  console.log('🔔 Setting up Realtime listener for new internships...');
+  console.log('🔔 Setting up Realtime listener for new jobs...');
   
   supabase
-    .channel('new-internship')
+    .channel('new-job')
     .on(
       'postgres_changes',
       {
         event: 'INSERT',
         schema: 'public',
-        table: 'internships'
+        table: 'jobs'
       },
       async (payload) => {
-        console.log('🆕 New internship detected:', payload.new.company);
+        console.log('🆕 New job detected:', payload.new.company);
         await sendSMSNotification(payload.new);
       }
     )
@@ -163,7 +163,7 @@ function setupRealtimeListener() {
       console.log('\n🚀 Attempting to insert jobs into Supabase...');
       
       try {
-        const { data, error } = await supabase.from('internships').insert(jobs);
+        const { data, error } = await supabase.from('jobs').insert(jobs);
         if (error) throw error;
         console.log(`✅ Successfully inserted ${data.length} new records into Supabase!`);
         
@@ -175,7 +175,7 @@ function setupRealtimeListener() {
         console.error('Make sure your environment variables are set correctly:');
         console.error('- SUPABASE_URL');
         console.error('- SUPABASE_SERVICE_ROLE_KEY');
-        console.error('And that your "internships" table exists in Supabase.');
+        console.error('And that your "jobs" table exists in Supabase.');
       }
     } else {
       console.log('\n⚠️ Supabase credentials not found in environment variables.');

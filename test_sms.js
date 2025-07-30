@@ -6,9 +6,9 @@ const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Function to send SMS notification
-async function sendSMSNotification(internship) {
+async function sendSMSNotification(job) {
   try {
-    console.log('📱 Sending SMS notification for:', internship.company);
+    console.log('📱 Sending SMS notification for:', job.company);
     
     const response = await fetch(`${SUPABASE_URL}/functions/v1/notify-sms`, {
       method: 'POST',
@@ -16,7 +16,7 @@ async function sendSMSNotification(internship) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${SUPABASE_KEY}`,
       },
-      body: JSON.stringify({ record: internship }),
+      body: JSON.stringify({ record: job }),
     });
 
     const result = await response.json();
@@ -35,16 +35,14 @@ async function sendSMSNotification(internship) {
 async function testSMS() {
   console.log('🧪 Testing SMS notification system...');
   
-  const testInternship = {
+  const testJob = {
     company: 'Test Company',
     role: 'Software Engineer Intern',
     location: 'San Francisco, CA',
-    'apply-link': 'https://test.com/apply',
-    'is-remote': false,
-    'is-hybrid': false
+    'apply-link': 'https://test.com/apply'
   };
 
-  await sendSMSNotification(testInternship);
+  await sendSMSNotification(testJob);
 }
 
 // Run the test
