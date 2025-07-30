@@ -20,9 +20,12 @@ function cleanHTML(html) {
   const lines = text.split('\n');
   const tableStart = lines.findIndex(line => line.includes('| Company |'));
 
-  const data = [];
+  const jobs = [];
   let lastValidCompany = '';
   let lastValidCompanyLink = '';
+
+  console.log('🔍 Starting to parse internship data...');
+  console.log(`📊 Found table starting at line ${tableStart}`);
 
   for (let i = tableStart + 2; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -72,18 +75,27 @@ function cleanHTML(html) {
       console.log(`⚠️ Error parsing applyRaw: ${applyRaw}`);
     }
 
-    // ----- DEBUG -----
-    console.log(`✅ Parsed row:`);
-    console.log(`Company: ${company}`);
-    console.log(`Role: ${role}`);
-    console.log(`Location: ${location}`);
-    console.log(`Apply: ${apply}`);
-    console.log(`Company Link: ${companyLink}`);
-    console.log(`Remote: ${isRemote} | Hybrid: ${isHybrid}`);
-    console.log('-----------------------------');
+    // ----- DEBUG LOGGING -----
+    console.log(`\n✅ Parsed job #${jobs.length + 1}:`);
+    console.log(`   Company: ${company}`);
+    console.log(`   Role: ${role}`);
+    console.log(`   Location: ${location}`);
+    console.log(`   Apply Link: ${apply}`);
+    console.log(`   Remote: ${isRemote}, Hybrid: ${isHybrid}`);
+    console.log('   ---');
 
-    data.push({ company, role, location, apply, companyLink, isRemote, isHybrid });
+    jobs.push({
+      company,
+      role,
+      location,
+      'apply-link': apply,
+      'company-link': companyLink,
+      'is-remote': isRemote,
+      'is-hybrid': isHybrid,
+    });
   }
 
-  console.log(`\n🎯 Finished parsing ${data.length} jobs`);
+  console.log(`\n🎯 Successfully parsed ${jobs.length} internship postings!`);
+  console.log(`📋 First 3 jobs as example:`);
+  console.log(JSON.stringify(jobs.slice(0, 3), null, 2));
 })();

@@ -1,0 +1,21 @@
+{
+  "name": "jobnotify",
+  "version": "1.0.0",
+  "description": "",
+  "main": "watchReadme.js",
+  "type": "module",
+  "scripts": {
+    "start": "node watchReadme.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SiddhantBorkar04/JobNotify.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SiddhantBorkar04/JobNotify/issues"
+  },
+  "homepage": "https://github.com/SiddhantBorkar04/JobNotify#readme"
+}
