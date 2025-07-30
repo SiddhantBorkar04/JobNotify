@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/SiddhantBorkar04/JobNotify#readme",
   "dependencies": {
+    "@supabase/supabase-js": "^2.53.0",
     "cheerio": "^1.1.2",
     "node-fetch": "^3.3.2"
   }
