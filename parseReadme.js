@@ -19,8 +19,60 @@ function cleanHTML(html) {
     .trim();
 }
 
+// Function to send SMS notification
+async function sendSMSNotification(internship) {
+  try {
+    console.log('📱 Sending SMS notification for:', internship.company);
+    
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/notify-sms`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+      },
+      body: JSON.stringify({ record: internship }),
+    });
+
+    const result = await response.json();
+    
+    if (result.success) {
+      console.log('✅ SMS sent successfully:', result.sid);
+    } else {
+      console.error('❌ SMS failed:', result.error);
+    }
+  } catch (error) {
+    console.error('❌ Error sending SMS:', error.message);
+  }
+}
+
+// Set up Realtime listener for new internships
+function setupRealtimeListener() {
+  console.log('🔔 Setting up Realtime listener for new internships...');
+  
+  supabase
+    .channel('new-internship')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'internships'
+      },
+      async (payload) => {
+        console.log('🆕 New internship detected:', payload.new.company);
+        await sendSMSNotification(payload.new);
+      }
+    )
+    .subscribe((status) => {
+      console.log('📡 Realtime subscription status:', status);
+    });
+}
+
 (async () => {
   try {
+    // Set up Realtime listener first
+    setupRealtimeListener();
+
     const res = await fetch(URL);
     const text = await res.text();
 
@@ -114,6 +166,10 @@ function cleanHTML(html) {
         const { data, error } = await supabase.from('internships').insert(jobs);
         if (error) throw error;
         console.log(`✅ Successfully inserted ${data.length} new records into Supabase!`);
+        
+        // The Realtime listener will automatically trigger SMS for new records
+        console.log('📱 SMS notifications will be sent via Realtime listener');
+        
       } catch (err) {
         console.error('❌ Supabase insert failed:', err.message);
         console.error('Make sure your environment variables are set correctly:');
@@ -125,6 +181,16 @@ function cleanHTML(html) {
       console.log('\n⚠️ Supabase credentials not found in environment variables.');
       console.log('Add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to your .env file or Railway environment variables.');
     }
+
+    // Keep the process running to maintain Realtime connection
+    console.log('\n🔄 Keeping process alive for Realtime notifications...');
+    console.log('Press Ctrl+C to stop');
+    
+    // Keep the process running
+    process.on('SIGINT', () => {
+      console.log('\n👋 Shutting down gracefully...');
+      process.exit(0);
+    });
 
   } catch (error) {
     console.error('❌ Error in main script:', error.message);
