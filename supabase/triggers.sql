@@ -8,7 +8,7 @@ BEGIN
   -- Make HTTP POST request to our Edge Function
   PERFORM
     net.http_post(
-      url := 'https://YOUR_PROJECT_REF.functions.supabase.co/notify-sms',
+      url := 'https://ymofwlgycxcvtdberymd.supabase.co/functions/v1/notify-sms',
       headers := '{"Content-Type": "application/json", "Authorization": "Bearer YOUR_ANON_KEY"}',
       body := json_build_object('record', row_to_json(NEW))
     );
